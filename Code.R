@@ -30,18 +30,20 @@ unique(Variables$Modifier..1)
 # How many solves did we have in total?
 
 # How many were with right, left or both paws?
-length(Variables$Modifier..2[Variables$Modifier..2=="right paw"])
+length(Variables$Modifier..2[Variables$Modifier..2=="right paw"]) #592
+length(Variables$Modifier..2[Variables$Modifier..2=="left paw"]) #612
+length(Variables$Modifier..2[Variables$Modifier..2=="both paws"]) #760
 
-
-# we are now running the model with just two outcome catgories (left and right), meaning you can use the lme4 package
+# we are now running the model with just two outcome categories (left and right), meaning you can use the lme4 package
 
 # much of the model specification remains the same - you can now use the 'binomial' model family
 
+Variables$Modifier..1<- factor(Variables$Modifier..1)
 
 
 Modifier..2 ~ Modifier..1 + (1|Subject)
 
-
+model.lat <- glmer(Modifier..2 ~ Modifier..1 + (1|Subject), data=Variables, family = binomial)
 
 
 
