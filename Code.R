@@ -15,7 +15,7 @@ str(Variables)
 # remove the 'unknowns',"both" and "head"
 Variables <- subset(Variables, subset=!(Variables$Modifier..2 %in% c("unknown", "head", "both paws"))) # adding the ! in front of %in% means 'remove all elements that are on this list'
 unique(Variables$Modifier..2)
-# "both paws" "right paw" "left paw"
+# "right paw" "left paw"
 
 # Currently there are rows where left or right lever are not specified:
 unique(Variables$Modifier..1)
@@ -108,3 +108,14 @@ repeatability <- var_Subject / (var_Subject + var_Residual)
 print(paste("Repeatability (R):", round(repeatability, 3)))
 
 # repeatabilies can range from 0-1. Our result of 0.039 indicates very low repeatability. 
+
+# looking at individua-level repeatability
+
+# Extract random effects
+ranef_subj <- ranef(model.lat)$Subject
+
+# Summarize random effects for each individual
+head(ranef_subj)
+
+hist(ranef_subj$`(Intercept)`)
+
