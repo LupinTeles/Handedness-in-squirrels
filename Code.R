@@ -86,6 +86,23 @@ summary(model.lat)
 # how to interpret this: 
 # the lever side (right/left) predicts which paw the squirrels use (right/left) - the effect is significant
 
+#Converting estimates into probabilities
+
+#converting intercept
+
+log_odds.int <- -1.1166
+
+probability.int <- exp(log_odds.int)/ (1 + exp(log_odds.int))
+
+print(probability.int)
+
+#converting Modifier..1
+
+log_odds.mod1 <- 2.5931
+
+probability.mod1<- exp(log_odds.mod1)/ (1+ exp(log_odds.mod1))
+
+print(probability.mod1)
 
 
 # 2) Repeatability --------------------------------------------------------
