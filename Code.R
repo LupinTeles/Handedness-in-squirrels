@@ -86,7 +86,8 @@ summary(model.lat)
 # how to interpret this: 
 # the lever side (right/left) predicts which paw the squirrels use (right/left) - the effect is significant
 
-#Converting estimates into probabilities
+
+#Converting estimates into probabilities-------------------------------- --------------------------------------------------------------------
 
 #converting intercept
 
@@ -104,6 +105,50 @@ probability.mod1<- exp(log_odds.mod1)/ (1+ exp(log_odds.mod1))
 
 print(probability.mod1)
 
+
+
+#Calculate the confidence interval-------------------------------------- ------------------------------------------------------------------
+
+# Z-score for 95% confidence interval
+z_score <- 1.96
+
+#Std errors
+std.error.int <- 0.1377
+std.error.mod1 <- 0.1627
+
+# Calculate the confidence intervals for intercept
+lower.bounds.int <- probability.int - z_score * std.error.int
+upper.bounds.int <- probability.int + z_score * std.error.int
+
+# Combine results into a data frame for better visualization
+ci.int <- data.frame(
+  Probability = probability.int,
+  SE = std.error.int,
+  Lower_Bound = lower.bounds.int,
+  Upper_Bound = upper.bounds.int
+)
+
+print(ci.int)
+##Probability     SE Lower_Bound Upper_Bound
+##1   0.2466425 0.1377 -0.02324951   0.5165345
+
+
+# Calculate the confidence intervals for Modifer..1
+lower.bounds.mod1 <- probability.mod1 - z_score * std.error.mod1
+upper.bounds.mod1 <- probability.mod1 + z_score * std.error.mod1
+
+# Combine results into a data frame for better visualization
+ci.mod1 <- data.frame(
+  Probability = probability.mod1,
+  SE = std.error.mod1,
+  Lower_Bound = lower.bounds.mod1,
+  Upper_Bound = upper.bounds.mod1
+)
+
+print(ci.mod1)
+
+##Probability     SE Lower_Bound Upper_Bound
+##1   0.9304162 0.1627   0.6115242    1.249308
 
 # 2) Repeatability --------------------------------------------------------
 
