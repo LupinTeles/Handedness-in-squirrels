@@ -4,10 +4,13 @@ data<- read.csv("CombinedCSV.csv", header= TRUE, stringsAsFactors=FALSE)
 #View data
 str(data)
 
-head(Variables)
 
 #Upload CSV with selected columns
 Variables<- read.csv("SelectedColumns.csv", header=TRUE, stringsAsFactors = FALSE)
+
+# look at the first few lines
+head(Variables)
+
 
 #View data
 str(Variables)
@@ -19,7 +22,7 @@ unique(Variables$Modifier..2)
 
 # Currently there are rows where left or right lever are not specified:
 unique(Variables$Modifier..1)
-# "right lever" "left lever"  "None" 
+# "right lever" "left lever"
 
 # we remove the ones with "none"
 Variables <- subset(Variables, subset = Variables$Modifier..1!="None")
@@ -50,61 +53,83 @@ Variables$Modifier..2<- factor(Variables$Modifier..2)
 
 library(lme4)
 
-model.lat <- glmer(Modifier..2 ~ Modifier..1 + (1|Subject), data=Variables, family = binomial)
+# SW: I have made one small change to the model - I instead of (1|subject), I included ( Modifier 1| subject), which allows individuals to have paw preferences for a given lever rather than overall. (random slope model)
+
+model.lat <- glmer(Modifier..2 ~ Modifier..1 + (Modifier..1|Subject), data=Variables, family = binomial)
 
 summary(model.lat)
 # Generalized linear mixed model fit by maximum likelihood (Laplace Approximation) [
 #   glmerMod]
 # Family: binomial  ( logit )
-# Formula: Modifier..2 ~ Modifier..1 + (1 | Subject)
+# Formula: Modifier..2 ~ Modifier..1 + (Modifier..1 | Subject)
 # Data: Variables
 # 
 # AIC      BIC   logLik deviance df.resid 
-# 1285.1   1300.4   -639.6   1279.1     1201 
+# 1266.7   1292.2   -628.4   1256.7     1199 
 # 
 # Scaled residuals: 
 #   Min      1Q  Median      3Q     Max 
-# -2.8006 -0.6618 -0.4344  0.5064  2.3022 
+# -3.8726 -0.6381 -0.4797  0.5136  2.0846 
 # 
 # Random effects:
-#   Groups  Name        Variance Std.Dev.
-# Subject (Intercept) 0.1344   0.3666  
+#   Groups  Name                   Variance Std.Dev. Corr 
+# Subject (Intercept)            0.1088   0.3299        
+# Modifier..1right lever 0.8255   0.9086   -0.51
 # Number of obs: 1204, groups:  Subject, 36
 # 
 # Fixed effects:
 #   Estimate Std. Error z value Pr(>|z|)    
-# (Intercept)             -1.1166     0.1377  -8.112 4.97e-16 ***
-#   Modifier..1right lever   2.5931     0.1627  15.934  < 2e-16 ***
+# (Intercept)             -1.1355     0.1556  -7.298 2.93e-13 ***
+#   Modifier..1right lever   2.6982     0.3071   8.785  < 2e-16 ***
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Correlation of Fixed Effects:
 #   (Intr)
-# Mdfr..1rghl -0.442
+# Mdfr..1rghl -0.563
 
 
 # how to interpret this: 
-# the lever side (right/left) predicts which paw the squirrels use (right/left) - the effect is significant
+
+# FIXED EFFECTS:
+# the intercept is the log odds of pushing right when the left lever is used (reference category)
+# Modifier..1right lever is the effect of using the right paw on the probability of pushing the right lever
+
+# RANDOM EFFECTS:
+# Subject (Intercept): some individuals show preferences for the left or the right lever regardless of paw preference
+# Slope variance (Modifier..1right lever): Some individuals may have a stronger or weaker tendency to push in a certain direction based on their paw preference
+# Correlation between intercept and slope (-0.51): A negative correlation suggests that individuals who generally push left more often (low intercept) tend to have a weaker effect of paw preference on push direction.
+
 
 
 #Converting estimates into probabilities-------------------------------- --------------------------------------------------------------------
 
 #converting intercept
 
-log_odds.int <- -1.1166
+log_odds.int <- -1.1355
 
 probability.int <- exp(log_odds.int)/ (1 + exp(log_odds.int))
 
 print(probability.int)
 
+# SW: perfect - you could also use the function 'plogis' as a shorter version
+plogis(fixef(model.lat)[1])
+# 0.2431525 -> 24.3% probability of using the right paw when pushing left
+# SW: what is the probability of using the left paw when pushing right?
+
+
+
 #converting Modifier..1
 
-log_odds.mod1 <- 2.5931
+log_odds.mod1 <- 2.698249 
 
 probability.mod1<- exp(log_odds.mod1)/ (1+ exp(log_odds.mod1))
 
 print(probability.mod1)
 
+plogis(fixef(model.lat)[2])
+# 0.9369233 -> squirrels have a 93.7% probability of using the right paw when pushing the right lever
+# SW: what is their probability of using the left paw when using the right lever?
 
 
 #Calculate the confidence interval-------------------------------------- ------------------------------------------------------------------
@@ -113,42 +138,60 @@ print(probability.mod1)
 z_score <- 1.96
 
 #Std errors
-std.error.int <- 0.1377
-std.error.mod1 <- 0.1627
+std.error.int <- 0.1556
+std.error.mod1 <- 0.3071
+
+# SW: this is almost right - you need to take the log odds rather than the estimates because the standard error is also on the log odd scale
+
 
 # Calculate the confidence intervals for intercept
-lower.bounds.int <- probability.int - z_score * std.error.int
-upper.bounds.int <- probability.int + z_score * std.error.int
+
+lower.bounds.int <- fixef(model.lat)[1] - z_score * std.error.int
+upper.bounds.int <- fixef(model.lat)[1] + z_score * std.error.int
+
+# SW: and THEN convert to probabilities:
+plogis(lower.bounds.int)
+#  0.1914759
+plogis(upper.bounds.int)
+# 0.30354
+
 
 # Combine results into a data frame for better visualization
 ci.int <- data.frame(
   Probability = probability.int,
   SE = std.error.int,
-  Lower_Bound = lower.bounds.int,
-  Upper_Bound = upper.bounds.int
+  Lower_Bound = plogis(lower.bounds.int),
+  Upper_Bound = plogis(upper.bounds.int)
 )
 
 print(ci.int)
-##Probability     SE Lower_Bound Upper_Bound
-##1   0.2466425 0.1377 -0.02324951   0.5165345
+# Probability     SE Lower_Bound Upper_Bound
+# (Intercept)   0.2431475 0.1556   0.1914759     0.30354
+
+# SW - these are now the probabilities of using the right paw when pushing left (reference category)
 
 
 # Calculate the confidence intervals for Modifer..1
-lower.bounds.mod1 <- probability.mod1 - z_score * std.error.mod1
-upper.bounds.mod1 <- probability.mod1 + z_score * std.error.mod1
+lower.bounds.mod1 <- fixef(model.lat)[2] - z_score * std.error.mod1
+upper.bounds.mod1 <- fixef(model.lat)[2] + z_score * std.error.mod1
 
 # Combine results into a data frame for better visualization
 ci.mod1 <- data.frame(
   Probability = probability.mod1,
   SE = std.error.mod1,
-  Lower_Bound = lower.bounds.mod1,
-  Upper_Bound = upper.bounds.mod1
+  Lower_Bound = plogis(lower.bounds.mod1),
+  Upper_Bound = plogis(upper.bounds.mod1)
 )
 
 print(ci.mod1)
+# 
+# Probability     SE Lower_Bound Upper_Bound
+# Modifier..1right lever   0.9369232 0.3071   0.8905463   0.9644345
 
-##Probability     SE Lower_Bound Upper_Bound
-##1   0.9304162 0.1627   0.6115242    1.249308
+#SW: probability of using the right paw when pushing right
+
+
+
 
 # 2) Repeatability --------------------------------------------------------
 
@@ -169,15 +212,20 @@ repeatability <- var_Subject / (var_Subject + var_Residual)
 # Print the repeatability
 print(paste("Repeatability (R):", round(repeatability, 3)))
 
-# repeatabilies can range from 0-1. Our result of 0.039 indicates very low repeatability. 
+# repeatabilies can range from 0-1. Our result of 0.032 indicates very low repeatability. 
 
 # looking at individua-level repeatability
+
+# SW - ignore these parts for now! I need to look at it again
 
 # Extract random effects
 ranef_subj <- ranef(model.lat)$Subject
 
+
 # Summarize random effects for each individual
 head(ranef_subj)
 
-hist(ranef_subj$`(Intercept)`)
+# probabilty of 
+hist(plogis(ranef_subj$`(Intercept)`))
+hist(plogis(ranef_subj$`Modifier..1right lever`))
 
