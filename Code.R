@@ -190,6 +190,20 @@ print(ci.mod1)
 
 #SW: probability of using the right paw when pushing right
 
+#LT: Probabilities of each paw with each lever 
+
+#Right paw right lever= 47.85%
+95.7*0.5= 47.85
+
+#Right paw left lever= 2.15
+4.3*0.5= 2.15
+
+#Right paw left lever = 12.15%
+24.3*0.5= 12.15
+
+#Left paw left lever= 37.85%
+100-47.85-2.15-12.15
+
 
 
 
