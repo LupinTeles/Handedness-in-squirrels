@@ -115,8 +115,9 @@ print(probability.int)
 # SW: perfect - you could also use the function 'plogis' as a shorter version
 plogis(fixef(model.lat)[1])
 # 0.2431525 -> 24.3% probability of using the right paw when pushing left
-# SW: what is the probability of using the left paw when pushing right?
+# SW: what is the probability of using the left paw when pushing left?
 
+1-plogis(fixef(model.lat)[1])
 
 
 #converting Modifier..1
@@ -190,19 +191,39 @@ print(ci.mod1)
 
 #SW: probability of using the right paw when pushing right
 
-#LT: Probabilities of each paw with each lever 
+## SW: Hmmm not quite - we already have extracted the probability of using the right paw on the right lever. (93.6% with CI 89.1-96.4%) - you can use exactly these numbers in the abstract. 
 
-#Right paw right lever= 47.85%
-95.7*0.5= 47.85
+## Now we also need the left paw on the left lever. Above, we have the probability of using the right paw on the left lever as 
 
-#Right paw left lever= 2.15
-4.3*0.5= 2.15
+#             Probability     SE Lower_Bound Upper_Bound
+# (Intercept)   0.2431475 0.1556   0.1914759     0.30354
 
-#Right paw left lever = 12.15%
-24.3*0.5= 12.15
+# = 24.3%. To calculate the probability of using the left paw of the left lever, we simply substract this number from 100%. 
 
-#Left paw left lever= 37.85%
-100-47.85-2.15-12.15
+1-0.2431475=0.7568525 # = 75.7%
+# The same goes for the confidence intervals - simply 1-lower bound and upper bound.
+
+1-0.30354= 0.69646 # = 69.6% for upper bound
+1-0.1914759 = 0.8085241 # = 80.9% for upper bound
+
+
+
+## SW: I commented this out - there is no need for the *0.5
+
+# 
+# #LT: Probabilities of each paw with each lever 
+# 
+# #Right paw right lever= 47.85%
+# 95.7*0.5= 47.85
+# 
+# #Right paw left lever= 2.15
+# 4.3*0.5= 2.15
+# 
+# #Right paw left lever = 12.15%
+# 24.3*0.5= 12.15
+# 
+# #Left paw left lever= 37.85%
+# 100-47.85-2.15-12.15
 
 
 
