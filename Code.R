@@ -38,6 +38,12 @@ length(Variables$Modifier..2[Variables$Modifier..2=="left paw"]) #612
 length(Variables$Modifier..2[Variables$Modifier..2=="both paws"]) #0
 #SW: sorry I had meant to remove both paws but had made a typo - there should be none now
 
+
+#LT: How many solves for each lever side?
+length(Variables$Modifier..1[Variables$Modifier..1=="right lever"])#471
+length(Variables$Modifier..1[Variables$Modifier..1=="left lever"])#733
+
+
 # we are now running the model with just two outcome categories (left and right), meaning you can use the lme4 package
 
 # much of the model specification remains the same - you can now use the 'binomial' model family
@@ -210,20 +216,6 @@ print(ci.mod1)
 
 ## SW: I commented this out - there is no need for the *0.5
 
-# 
-# #LT: Probabilities of each paw with each lever 
-# 
-# #Right paw right lever= 47.85%
-# 95.7*0.5= 47.85
-# 
-# #Right paw left lever= 2.15
-# 4.3*0.5= 2.15
-# 
-# #Right paw left lever = 12.15%
-# 24.3*0.5= 12.15
-# 
-# #Left paw left lever= 37.85%
-# 100-47.85-2.15-12.15
 
 
 
