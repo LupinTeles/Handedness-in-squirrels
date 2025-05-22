@@ -256,3 +256,28 @@ head(ranef_subj)
 hist(plogis(ranef_subj$`(Intercept)`))
 hist(plogis(ranef_subj$`Modifier..1right lever`))
 
+# 3) plotting graphs --------------------------------------------------- ---
+
+library(ggplot2)
+
+# Build the data frame
+plot_data <- data.frame(
+  Lever = rep(c("Left lever", "Right lever"), each = 2),
+  Paw = rep(c("Right paw", "Left paw"), 2),
+  Probability = c(0.2431, 0.7569, 0.9369, 0.0631),
+  Lower = c(0.1915, 0.6965, 0.8905, 0.0356),
+  Upper = c(0.3035, 0.8085, 0.9644, 0.1095)
+)
+
+
+#Graph
+
+ggplot(plot_data, aes(x = Lever, y = Probability, fill = Paw)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
+  geom_errorbar(aes(ymin = Lower, ymax = Upper), 
+                position = position_dodge(width = 0.8), width = 0.2) +
+  scale_fill_manual(values = c("grey40", "grey60")) +
+  labs(title = "Predicted Probability of Paw Use by Lever Side",
+       y = "Predicted Probability", x = "Lever Side") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "top")
