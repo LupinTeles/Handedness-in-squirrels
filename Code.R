@@ -276,7 +276,7 @@ ggplot(plot_data, aes(x = Lever, y = Probability, fill = Paw)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
   geom_errorbar(aes(ymin = Lower, ymax = Upper), 
                 position = position_dodge(width = 0.8), width = 0.2) +
-  scale_fill_manual(values = c("grey40", "grey60")) +
+  scale_fill_manual(values = c("orange", "orange4")) +
   labs(title = "Predicted Probability of Paw Use by Lever Side",
        y = "Predicted Probability", x = "Lever Side") +
   theme_minimal(base_size = 14) +
