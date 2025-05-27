@@ -279,5 +279,5 @@ ggplot(plot_data, aes(x = Lever, y = Probability, fill = Paw)) +
   scale_fill_manual(values = c("orange", "orange4")) +
   labs(title = "Predicted Probability of Paw Use by Lever Side",
        y = "Predicted Probability", x = "Lever Side") +
-  theme_minimal(base_size = 14) +
+  theme_minimal(base_size = 20) +
   theme(legend.position = "top")
