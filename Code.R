@@ -256,6 +256,36 @@ head(ranef_subj)
 hist(plogis(ranef_subj$`(Intercept)`))
 hist(plogis(ranef_subj$`Modifier..1right lever`))
 
+# LT - Function to calculate repeatability from a fitted model
+
+calc_repeatability <- function(fit) {
+  var_Subject <- as.numeric(VarCorr(fit)$Subject[1])
+  var_Residual <- pi^2 / 3  
+  R <- var_Subject / (var_Subject + var_Residual)
+  return(R)
+}
+
+# Run the bootstrap
+set.seed(123)
+
+boot_results <- bootMer(
+  model.lat,
+  FUN = calc_repeatability,
+  nsim = 1000,
+  type = "parametric",    
+  use.u = FALSE,          
+  re.form = NULL,         
+  verbose = TRUE          
+)
+
+
+repeatability_CI <- quantile(boot_results$t, probs = c(0.025, 0.5, 0.975))
+names(repeatability_CI) <- c("Lower", "Median", "Upper")
+print(repeatability_CI)
+
+#Lower      Median       Upper 
+#0.008099592 0.030422721 0.070629562 
+
 # 3) plotting graphs --------------------------------------------------- ---
 
 library(ggplot2)
